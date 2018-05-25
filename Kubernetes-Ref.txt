@@ -1,0 +1,203 @@
+Kubenetes
+
+Kubernetes is a cluster and orchestration engine for docker containers
+
+https://www.linuxtechi.com/install-kubernetes-1-7-centos7-rhel7/
+
+On the Master Node following components will be installed
+
+API Server  – It provides kubernetes API using Jason / Yaml over http, states of API objects are stored in etcd
+Scheduler  – It is a program on master node which performs the scheduling tasks like launching containers in worker nodes based on resource availability
+Controller Manager – Main Job of Controller manager is to monitor replication controllers and create pods to maintain desired state.
+etcd – It is a Key value pair data base. It stores configuration data of cluster and cluster state.
+Kubectl utility – It is a command line utility which connects to API Server on port 6443. It is used by administrators to create pods, services etc.
+
+On Worker Nodes following components will be installed
+
+Kubelet – It is an agent which runs on every worker node, it connects to docker  and takes care of creating, starting, deleting containers.
+Kube-Proxy – It routes the traffic to appropriate containers based on ip address and port number of the incoming request. In other words we can say it is used for port translation.
+Pod – Pod can be defined as a multi-tier or group of containers that are deployed on a single worker node or docker host.
+
+Login as root in Master Node
+
+Step 1: Disable SELinux & setup firewall rules
+~]# hostnamectl set-hostname 'k8s-master'
+~]# exec bash
+~]# setenforce 0
+~]# sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
+
+Set the following firewall rules.
+
+[root@k8s-master ~]# firewall-cmd --permanent --add-port=6443/tcp
+[root@k8s-master ~]# firewall-cmd --permanent --add-port=2379-2380/tcp
+[root@k8s-master ~]# firewall-cmd --permanent --add-port=10250/tcp
+[root@k8s-master ~]# firewall-cmd --permanent --add-port=10251/tcp
+[root@k8s-master ~]# firewall-cmd --permanent --add-port=10252/tcp
+[root@k8s-master ~]# firewall-cmd --permanent --add-port=10255/tcp
+[root@k8s-master ~]# firewall-cmd --reload
+[root@k8s-master ~]# echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables [added the entry in \etc\sysctl]
+
+
+modprobe br_netfilter
+firewall-cmd –-reload
+
+Note: In case you don’t have your own dns server then update /etc/hosts file on master and worker nodes
+
+192.168.44.129 k8s-master
+192.168.44.130 worker-node1
+192.168.44.132 worker-node2
+
+
+Step 2: Configure Kubernetes Repository
+
+[root@k8s-master ~]# cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+> [kubernetes]
+> name=Kubernetes
+> baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+> enabled=1
+> gpgcheck=1
+> repo_gpgcheck=1
+> gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
+>         https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+> EOF [root@k8s-master ~]#
+
+Step 3: Install Kubeadm and Docker
+
+[root@k8s-master ~]# yum install kubeadm docker -y
+
+Start and enable kubectl and docker service
+
+[root@k8s-master ~]# systemctl restart docker && systemctl enable docker
+[root@k8s-master ~]# systemctl  restart kubelet && systemctl enable kubelet
+
+Step 4: Initialize Kubernetes Master with ‘kubeadm init’
+
+
+
+sudo curl -L git.io/weave -o /usr/local/bin/weave && chmod a+x /usr/local/bin/weave
+
+
+kubeadm reset
+yum install dnsmasq
+cp /etc/resolv.conf ~/resolv.conf_bck
+rm -rf /etc/resolv.conf
+echo -e "nameserver 127.0.0.1\nnameserver $(hostname -i)" >> /etc/resolv.conf
+chmod 444 /etc/resolv.conf
+chattr +i /etc/resolv.conf
+echo -e "server=8.8.8.8\nserver=8.8.4.4" > /etc/dnsmasq.conf
+echo -e "$(hostname -i)\tlocalhost.$(hostname -d)" >> /etc/hosts
+service dnsmasq restart
+firewall-cmd --zone=public --add-port=6443/tcp --permanent && sudo firewall-cmd --zone=public --add-port=10250/tcp --permanent && sudo systemctl restart firewalld
+kubeadm init
+
+==============================================
+
+http://www.marcolenzo.eu/create-a-kubernetes-cluster-on-centos-7/
+https://severalnines.com/blog/installing-kubernetes-cluster-minions-centos7-manage-pods-services
+
+
+[root@bala Kubernetes]# kubectl get nodes
+NAME             STATUS                     AGE
+192.168.17.129        Ready,SchedulingDisabled   5d
+192.168.17.130   Ready                      5d
+192.168.17.131   Ready                      5d
+
+kubectl patch node 127.0.0.1  -p "{\"spec\":{\"unschedulable\":true}}"
+
+kubectl cluster-info
+
+#cs component status
+[root@bala Kubernetes]# kubectl get cs
+NAME                 STATUS    MESSAGE              ERROR
+etcd-0               Healthy   {"health": "true"}
+controller-manager   Healthy   ok
+scheduler            Healthy   ok
+[root@bala Kubernetes]#
+
+================Master=============
+for SERVICES in etcd kube-apiserver kube-controller-manager kube-scheduler flanneld; do
+	systemctl restart $SERVICES
+	systemctl enable $SERVICES
+	systemctl status $SERVICES
+done
+==============Node=================
+for SERVICES in kube-proxy kubelet flanneld docker; do
+    systemctl restart $SERVICES
+    systemctl enable $SERVICES
+    systemctl status $SERVICES
+done
+===================================
+#delete pods 
+kubectl delete /svc/pod 'name of the pods/svcs'
+
+
+kubectl get nodes
+kubectl get pod
+kubectl get svc
+kubectl get rc
+
+kubectl create -f db-pod.yml
+kubectl replace --force -f db-pod.yml
+kubectl get pods
+
+kubectl create -f db-svc.yaml
+kubectl get svc
+
+kubectl create -f web-pod.yml
+kubectl get pods
+
+kubectl describe po POD_NAME
+
+#all parameters are set here...
+/etc/kubernetes/apiserver
+# default admission control policies
+#KUBE_ADMISSION_CONTROL="--admission-control=NamespaceLifecycle,NamespaceExists,LimitRanger,SecurityContextDeny,ServiceAccount,ResourceQuota"
+
+/etc/kubernetes/kubelet
+# pod infrastructure container
+#KUBELET_POD_INFRA_CONTAINER="--pod-infra-container-image=registry.access.redhat.com/rhel7/pod-infrastructure:latest"
+
+
+KUBELET_DNS=--cluster-dns= 10.10.0.10
+KUBELET_DOMAIN=--cluster-domain=cluster.local#
+
+
+yum install -y rhsm
+
+kubectl delete pod redis --grace-period=0 --force
+kubectl delete svc kube-dns --grace-period=0 --force
+kubectl get svc --all-namespaces
+kubectl get pod --all-namespaces
+
+kubectl exec -it web /bin/bash
+
+kubectl get services --namespace=kube-system
+
+================Master=============
+for SERVICES in etcd kube-apiserver kube-controller-manager kube-scheduler flanneld; do
+	systemctl stop $SERVICES
+	systemctl disable $SERVICES
+	systemctl status $SERVICES
+done
+==============Node=================
+for SERVICES in kube-proxy kubelet flanneld docker; do
+    systemctl stop $SERVICES
+    systemctl disable $SERVICES
+    systemctl status $SERVICES
+done
+===================================
+
+Step 1: Docker Private Registry
+-------------------------------
+docker-machine create -d virtualbox registry
+docker-machine ssh registry "mkdir ~/data"
+eval $(docker-machine env registry)
+---
+docker run -d -p 80:5000 --restart=always --name registry   -v /home/docker/data:/var/lib/registry registry:2
+REG_IP=`docker-machine ip registry`
+
+Step 2: Docker Dev Machine
+---------------------------
+docker-machine create -d virtualbox dev
+docker-machine ssh dev
+EXTRA_ARGS="--insecure-registry <REG_IP>:80"
