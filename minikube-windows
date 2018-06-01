@@ -32,4 +32,4 @@ Stopping and Deleting the Cluster
 minikube stop
 minikube delete
 
-
+Thanks to : https://rominirani.com/tutorial-getting-started-with-kubernetes-on-your-windows-laptop-with-minikube-3269b54a226
