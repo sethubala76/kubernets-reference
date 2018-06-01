@@ -22,4 +22,14 @@ kubectl describe service hello-nginx
 minikube service --url=true hello-nginx
 kubectl logs hello-nginx-2471083592-4vfz8 <pod name>
 
+Scaling the Service
+---------------------
+kubectl scale --replicas=3 deployment/hello-nginx
+kubectl get deployment
+
+Stopping and Deleting the Cluster
+----------------------------------
+minikube stop
+minikube delete
+
 
