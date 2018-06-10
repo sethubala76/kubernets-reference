@@ -1,1 +1,5 @@
 https://cloud.google.com/sdk/docs/quickstart-windows
+------ commands--------
+
+gcloud compute instances list
+
