@@ -112,7 +112,7 @@ metadata:
     pv.beta.kubernetes.io/gid: "1234"
     
 #NFS syntax for NFS mount side
-
+============================================
 kind: PersistentVolume
 apiVersion: v1
 metadata:
@@ -128,4 +128,24 @@ spec:
   persistanceVolumeclaimPolicy: Recycle
   nfs:
     path: opt/data/web
-    server: 10.250.1.2
+    server: 10.245.1.2
+-----------------------
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: task-pv-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
+---------------------------
+#refer previous POD definition for claiming the Persistance Volume
+
+# Configure NFS from master node
+vim /etc/exports
+/opt/data 10.245.1.2/24 (rw,sync, no_root_squash, no_all_squash)
+cd /opt/data
+
