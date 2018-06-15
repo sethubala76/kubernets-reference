@@ -110,3 +110,22 @@ metadata:
   name: pv1
   annotations:
     pv.beta.kubernetes.io/gid: "1234"
+    
+#NFS syntax for NFS mount side
+
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: task-pv-volume
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistanceVolumeclaimPolicy: Recycle
+  nfs:
+    path: opt/data/web
+    server: 10.250.1.2
