@@ -19,6 +19,15 @@ Canery deployment steps
 #create a depolyment and service in a single command
 kubectl create -f j-hello.yml -f j-hello-svc.yml
 watch kubectl get deployments
+kubectl scale deployment j-hello --replicas=10
+kubectl rollout status deploy/j-hello
+kubectl set image deployment j-hello j-hello=sethubala76/j-hello:<version>
+kubectl rollout pause deploy/j-hello
+kubectl rollout status deploy/j-hello  # again run the same command and check the 50% of the deployment
+
+while true; do curl node1:$NODE_PORT; echo "";sleep 1;done
+
+kubectl rollout resume deploy/j-hello
 
 
 
