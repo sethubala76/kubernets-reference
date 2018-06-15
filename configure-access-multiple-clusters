@@ -82,3 +82,357 @@ contexts:
   name: dev-ramp-up
   
   The preceding configuration file defines a new context named dev-ramp-up.
+
+Tasks
+Install Tools
+Install and Set Up kubectl
+Install Minikube
+Installing kubeadm
+Configure Pods and Containers
+Assign Memory Resources to Containers and Pods
+Assign CPU Resources to Containers and Pods
+Configure Quality of Service for Pods
+Assign Extended Resources to a Container
+Configure a Pod to Use a Volume for Storage
+Configure a Pod to Use a PersistentVolume for Storage
+Configure a Pod to Use a Projected Volume for Storage
+Configure a Security Context for a Pod or Container
+Configure Service Accounts for Pods
+Pull an Image from a Private Registry
+Configure Liveness and Readiness Probes
+Assign Pods to Nodes
+Configure Pod Initialization
+Attach Handlers to Container Lifecycle Events
+Configure a Pod to Use a ConfigMap
+Share Process Namespace between Containers in a Pod
+Translate a Docker Compose File to Kubernetes Resources
+Administer a Cluster
+Administration with kubeadm
+Upgrading kubeadm HA clusters from 1.9.x to 1.9.y
+Upgrading kubeadm clusters from 1.7 to 1.8
+Upgrading/downgrading kubeadm clusters between v1.8 to v1.9
+Manage Memory, CPU, and API Resources
+Configure Default Memory Requests and Limits for a Namespace
+Configure Default CPU Requests and Limits for a Namespace
+Configure Minimum and Maximum Memory Constraints for a Namespace
+Configure Minimum and Maximum CPU Constraints for a Namespace
+Configure Memory and CPU Quotas for a Namespace
+Configure a Pod Quota for a Namespace
+Install a Network Policy Provider
+Use Calico for NetworkPolicy
+Use Cilium for NetworkPolicy
+Use Kube-router for NetworkPolicy
+Romana for NetworkPolicy
+Weave Net for NetworkPolicy
+Access Clusters Using the Kubernetes API
+Access Services Running on Clusters
+Advertise Extended Resources for a Node
+Autoscale the DNS Service in a Cluster
+Change the Reclaim Policy of a PersistentVolume
+Change the default StorageClass
+Cluster Management
+Configure Multiple Schedulers
+Configure Out Of Resource Handling
+Configure Quotas for API Objects
+Control CPU Management Policies on the Node
+Customizing DNS Service
+Debugging DNS Resolution
+Declare Network Policy
+Developing Cloud Controller Manager
+Encrypting Secret Data at Rest
+Guaranteed Scheduling For Critical Add-On Pods
+IP Masquerade Agent User Guide
+Kubernetes Cloud Controller Manager
+Limit Storage Consumption
+Namespaces Walkthrough
+Operating etcd clusters for Kubernetes
+Persistent Volume Claim Protection
+Reconfigure a Node's Kubelet in a Live Cluster
+Reserve Compute Resources for System Daemons
+Safely Drain a Node while Respecting Application SLOs
+Securing a Cluster
+Set Kubelet parameters via a config file
+Set up High-Availability Kubernetes Masters
+Set up a High-Availability Etcd Cluster With Kubeadm
+Share a Cluster with Namespaces
+Static Pods
+Storage Object in Use Protection
+Using CoreDNS for Service Discovery
+Using Sysctls in a Kubernetes Cluster
+Using a KMS provider for data encryption
+Inject Data Into Applications
+Define a Command and Arguments for a Container
+Define Environment Variables for a Container
+Expose Pod Information to Containers Through Environment Variables
+Expose Pod Information to Containers Through Files
+Distribute Credentials Securely Using Secrets
+Inject Information into Pods Using a PodPreset
+Run Applications
+Run a Stateless Application Using a Deployment
+Run a Single-Instance Stateful Application
+Run a Replicated Stateful Application
+Update API Objects in Place Using kubectl patch
+Scale a StatefulSet
+Delete a StatefulSet
+Force Delete StatefulSet Pods
+Perform Rolling Update Using a Replication Controller
+Horizontal Pod Autoscaler
+Horizontal Pod Autoscaler Walkthrough
+Specifying a Disruption Budget for your Application
+Run Jobs
+Running automated tasks with cron jobs
+Parallel Processing using Expansions
+Coarse Parallel Processing Using a Work Queue
+Fine Parallel Processing Using a Work Queue
+Access Applications in a Cluster
+Web UI (Dashboard)
+Accessing Clusters
+Configure Access to Multiple Clusters
+Use Port Forwarding to Access Applications in a Cluster
+Provide Load-Balanced Access to an Application in a Cluster
+Use a Service to Access an Application in a Cluster
+Connect a Front End to a Back End Using a Service
+Create an External Load Balancer
+Configure Your Cloud Provider's Firewalls
+List All Container Images Running in a Cluster
+Communicate Between Containers in the Same Pod Using a Shared Volume
+Configure DNS for a Cluster
+Monitor, Log, and Debug
+Application Introspection and Debugging
+Auditing
+Core metrics pipeline
+Debug Init Containers
+Debug Pods and Replication Controllers
+Debug Services
+Debug a StatefulSet
+Determine the Reason for Pod Failure
+Developing and debugging services locally
+Events in Stackdriver
+Get a Shell to a Running Container
+Logging Using Elasticsearch and Kibana
+Logging Using Stackdriver
+Monitor Node Health
+Tools for Monitoring Compute, Storage, and Network Resources
+Troubleshoot Applications
+Troubleshoot Clusters
+Troubleshooting
+Extend Kubernetes
+Configure the aggregation layer
+Extend the Kubernetes API with CustomResourceDefinitions
+Migrate a ThirdPartyResource to CustomResourceDefinition
+Setup an extension API server
+Use an HTTP Proxy to Access the Kubernetes API
+TLS
+Certificate Rotation
+Manage TLS Certificates in a Cluster
+Federation - Run an App on Multiple Clusters
+Cross-cluster Service Discovery using Federated Services
+Set up Cluster Federation with Kubefed
+Set up CoreDNS as DNS provider for Cluster Federation
+Set up placement policies in Federation
+Manage Cluster Daemons
+Perform a Rolling Update on a DaemonSet
+Performing a Rollback on a DaemonSet
+Install Service Catalog
+Install Service Catalog using Helm
+Install Service Catalog using SC
+Federation - Run an App on Multiple Clusters
+Federated Cluster
+Federated ConfigMap
+Federated DaemonSet
+Federated Deployment
+Federated Events
+Federated Horizontal Pod Autoscalers (HPA)
+Federated Ingress
+Federated Jobs
+Federated Namespaces
+Federated ReplicaSets
+Federated Secrets
+Extend kubectl with plugins
+Manage HugePages
+Schedule GPUs
+Edit This Page
+
+Configure Access to Multiple Clusters
+This page shows how to configure access to multiple clusters by using configuration files. After your clusters, users, and contexts are defined in one or more configuration files, you can quickly switch between clusters by using the kubectl config use-context command.
+
+Note: A file that is used to configure access to a cluster is sometimes called a kubeconfig file. This is a generic way of referring to configuration files. It does not mean that there is a file named kubeconfig.
+Before you begin
+Define clusters, users, and contexts
+Create a second configuration file
+Set the KUBECONFIG environment variable
+Explore the $HOME/.kube directory
+Append $HOME/.kube/config to your KUBECONFIG environment variable
+Clean up
+What's next
+Before you begin
+You need to have the kubectl command-line tool installed.
+
+Define clusters, users, and contexts
+Suppose you have two clusters, one for development work and one for scratch work. In the development cluster, your frontend developers work in a namespace called frontend, and your storage developers work in a namespace called storage. In your scratch cluster, developers work in the default namespace, or they create auxiliary namespaces as they see fit. Access to the development cluster requires authentication by certificate. Access to the scratch cluster requires authentication by username and password.
+
+Create a directory named config-exercise. In your config-exercise directory, create a file named config-demo with this content:
+
+apiVersion: v1
+kind: Config
+preferences: {}
+
+clusters:
+- cluster:
+  name: development
+- cluster:
+  name: scratch
+
+users:
+- name: developer
+- name: experimenter
+
+contexts:
+- context:
+  name: dev-frontend
+- context:
+  name: dev-storage
+- context:
+  name: exp-scratch
+A configuration file describes clusters, users, and contexts. Your config-demo file has the framework to describe two clusters, two users, and three contexts.
+
+Go to your config-exercise directory. Enter these commands to add cluster details to your configuration file:
+
+kubectl config --kubeconfig=config-demo set-cluster development --server=https://1.2.3.4 --certificate-authority=fake-ca-file
+kubectl config --kubeconfig=config-demo set-cluster scratch --server=https://5.6.7.8 --insecure-skip-tls-verify
+Add user details to your configuration file:
+
+kubectl config --kubeconfig=config-demo set-credentials developer --client-certificate=fake-cert-file --client-key=fake-key-seefile
+kubectl config --kubeconfig=config-demo set-credentials experimenter --username=exp --password=some-password
+Add context details to your configuration file:
+
+kubectl config --kubeconfig=config-demo set-context dev-frontend --cluster=development --namespace=frontend --user=developer
+kubectl config --kubeconfig=config-demo set-context dev-storage --cluster=development --namespace=storage --user=developer
+kubectl config --kubeconfig=config-demo set-context exp-scratch --cluster=scratch --namespace=default --user=experimenter
+Open your config-demo file to see the added details. As an alternative to opening the config-demo file, you can use the config view command.
+
+kubectl config --kubeconfig=config-demo view
+The output shows the two clusters, two users, and three contexts:
+
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority: fake-ca-file
+    server: https://1.2.3.4
+  name: development
+- cluster:
+    insecure-skip-tls-verify: true
+    server: https://5.6.7.8
+  name: scratch
+contexts:
+- context:
+    cluster: development
+    namespace: frontend
+    user: developer
+  name: dev-frontend
+- context:
+    cluster: development
+    namespace: storage
+    user: developer
+  name: dev-storage
+- context:
+    cluster: scratch
+    namespace: default
+    user: experimenter
+  name: exp-scratch
+current-context: ""
+kind: Config
+preferences: {}
+users:
+- name: developer
+  user:
+    client-certificate: fake-cert-file
+    client-key: fake-key-file
+- name: experimenter
+  user:
+    password: some-password
+    username: exp
+Each context is a triple (cluster, user, namespace). For example, the dev-frontend context says, Use the credentials of the developer user to access the frontend namespace of the development cluster.
+
+Set the current context:
+
+kubectl config --kubeconfig=config-demo use-context dev-frontend
+Now whenever you enter a kubectl command, the action will apply to the cluster, and namespace listed in the dev-frontend context. And the command will use the credentials of the user listed in the dev-frontend context.
+
+To see only the configuration information associated with the current context, use the --minify flag.
+
+kubectl config --kubeconfig=config-demo view --minify
+The output shows configuration information associated with the dev-frontend context:
+
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority: fake-ca-file
+    server: https://1.2.3.4
+  name: development
+contexts:
+- context:
+    cluster: development
+    namespace: frontend
+    user: developer
+  name: dev-frontend
+current-context: dev-frontend
+kind: Config
+preferences: {}
+users:
+- name: developer
+  user:
+    client-certificate: fake-cert-file
+    client-key: fake-key-file
+Now suppose you want to work for a while in the scratch cluster.
+
+Change the current context to exp-scratch:
+
+kubectl config --kubeconfig=config-demo use-context exp-scratch
+Now any kubectl command you give will apply to the default namespace of the scratch cluster. And the command will use the credentials of the user listed in the exp-scratch context.
+
+View configuration associated with the new current context, exp-scratch.
+
+kubectl config --kubeconfig=config-demo view --minify
+Finally, suppose you want to work for a while in the storage namespace of the development cluster.
+
+Change the current context to dev-storage:
+
+kubectl config --kubeconfig=config-demo use-context dev-storage
+View configuration associated with the new current context, dev-storage.
+
+kubectl config --kubeconfig=config-demo view --minify
+Create a second configuration file
+In your config-exercise directory, create a file named config-demo-2 with this content:
+
+apiVersion: v1
+kind: Config
+preferences: {}
+
+contexts:
+- context:
+    cluster: development
+    namespace: ramp
+    user: developer
+  name: dev-ramp-up
+The preceding configuration file defines a new context named dev-ramp-up.
+
+Set the KUBECONFIG environment variable
+
+export  KUBECONFIG_SAVED=$KUBECONFIG
+export  KUBECONFIG=$KUBECONFIG:config-demo:config-demo-2
+In your config-exercise directory, enter this command:
+kubectl config view
+
+Explore the $HOME/.kube directory
+Go to $HOME/.kube, and see what files are there. Typically, there is a file named config.
+
+Append $HOME/.kube/config to your KUBECONFIG environment variable
+
+export KUBECONFIG=$KUBECONFIG:$HOME/.kube/config
+kubectl config view
+
+Clean up
+export KUBECONFIG=$KUBECONFIG_SAVED
+
+
