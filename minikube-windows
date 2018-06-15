@@ -1,4 +1,4 @@
-.\minikube get-k8s-versions
+.\minikube get-k8s-versions # This may not work in my setup, but kept for reference
 
 minikube.exe start --kubernetes-version="v1.10.0" --vm-driver="virtualbox"
 Note:- You need to have virtualbox in your local machine. Disable local hypervisor in windows 10
