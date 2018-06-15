@@ -1,7 +1,29 @@
 https://kubernetes.io/docs/reference/kubectl/cheatsheet/
 
+#create a depolyment and service in a single command
+kubectl create -f j-hello.yml -f j-hello-svc.yml
+
 kubectl scale deployment/<update-demo> --replicas=4
-kubectl edit deployment/<update-demo>  #modified image inside the deployment yml file
+kubectl edit deployment/<update-demo>  #with a modified image inside the deployment yml file
 kubectl rollout undo deployment/<update-demo>
+kubectl rollout history deployment <j-hello>
+
+kubectl scale deployment <image-name> --replicas=10
+kubectl set image deployment <image-name> <image-name>=sethubala76/<image-name>:version
+kubectl delete deployment <image-name>
+kubectl delete service <image-service-name>
+
+======
+Canery deployment steps
+-----------------------
+#create a depolyment and service in a single command
+kubectl create -f j-hello.yml -f j-hello-svc.yml
+watch kubectl get deployments
+
+
+
+
+
+
 
 
