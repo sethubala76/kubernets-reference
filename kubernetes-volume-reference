@@ -1,0 +1,35 @@
+1. hostbase volume
+   i. emptydir
+   ii. host volume
+
+# sample pod definition
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis
+spec:
+  containers:
+  - name: redis
+    image: redis
+    volumeMounts:
+    - name: redis-storage
+      mountPath: /data/redis
+  volumes:
+  - name: redis-storage
+    hostPath:
+    path: /var/lib/my_data
+   
+#GKE Cloud persistance volume definition
+
+  volumes:
+  - name: redis-storage
+    gcePersistanceDisk:
+      pdName: my-data-disk
+      fsType: ext4
+   
+# Create GKE persistance volume
+
+gcloud compute disks create --size=10GB --zone=asia-east1-a my-data-disk
+
+2. storage 
